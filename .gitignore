@@ -1,7 +1,5 @@
-
 .DS_Store
-build
-.git
+.idea/
 *.egg-info
 dist
 output
