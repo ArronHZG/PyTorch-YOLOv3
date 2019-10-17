@@ -1,7 +1,5 @@
 #!/bin/bash
-
 NUM_CLASSES=$1
-
 echo "
 [net]
 # Testing

@@ -1,4 +1,6 @@
 import os, glob
+import random
+
 import cv2
 from scipy.io import loadmat
 from collections import defaultdict
@@ -65,34 +67,27 @@ def seq2img(annos, seq_file, outdir, cam_id):
 
 def anno2txt(vbb_outdir, filename, anno):
     """bbox_type: xyxy (xmin, ymin, xmax, ymax); xywh (xmin, ymin, width, height)"""
+
     assert anno["label"] is "person"
-    print(len(anno['bbox']))
-    width = 640
-    high = 480
-    filename = os.path.splitext(filename)[0] + ".txt"
-    with open(os.path.join(vbb_outdir, filename), 'a+') as f:
-        for index, bbox in enumerate(anno['bbox']):
-            bbox = [float(x) for x in bbox]
-            label = 0
-            center_x = (2 * bbox[0] + bbox[2]) / 2 / width
-            center_y = (2 * bbox[1] + bbox[3]) / 2 / high
-            w = bbox[2] / width
-            h = bbox[3] / high
-            line = f"{label} {center_x} {center_y} {w} {h}\n"
-            f.write(line)
+
+    video = filename.split("_")[1]
+    path_name = os.path.join("data","custom","images",filename)+"\n"
+    with open(os.path.join("data","custom","train.txt"), 'a+') as train:
+        with open(os.path.join("data","custom","valid.txt"), 'a+') as valid:
+            with open(os.path.join("data","custom","total.txt"), 'a+') as f:
+                f.write(path_name)
+            if random.randint(0, 9) is 0:
+                valid.write(path_name)
+            else:
+                train.write(path_name)
 
 
 def parse_anno_file(vbb_inputdir, vbb_outputdir):
     # annotation sub-directories in hda annotation input directory
-    if not os.path.exists(vbb_outputdir):
-        os.makedirs(vbb_outputdir)
     sub_dirs = os.listdir(vbb_inputdir)  # 对应set00,set01...
 
     for sub_dir in sub_dirs:
         print("Parsing annotations of camera: ", sub_dir)
-        # print(os.path.join(vbb_outputdir,sub_dir))
-        if not os.path.exists(os.path.join(vbb_outputdir,sub_dir)):
-            os.makedirs(os.path.join(vbb_outputdir,sub_dir))
         # 获取某一个子set下面的所有vbb文件
         vbb_files = glob.glob(os.path.join(vbb_inputdir, sub_dir, "*.vbb"))
         for vbb_file in vbb_files:
@@ -127,16 +122,9 @@ def visualize_bbox(xml_file, img_file):
 
 def main():
     vbb_inputdir = "/mnt/space-2/DataSet/PedestrianDetection/Caltech/annotations"
-    vbb_outputdir = "/home/hzg/code/PyTorch-YOLOv3/data/custom/labels/"
+    vbb_outputdir = "/home/hzg/code/PyTorch-YOLOv3/data/custom/"
     parse_anno_file(vbb_inputdir, vbb_outputdir)
 
 
 if __name__ == "__main__":
     main()
-# ————————————————
-# 版权声明：本文为CSDN博主「QLing000」的原创文章，遵循
-# CC
-# 4.0
-# BY - SA
-# 版权协议，转载请附上原文出处链接及本声明。
-# 原文链接：https: // blog.csdn.net / QLing000 / article / details / 94550143
